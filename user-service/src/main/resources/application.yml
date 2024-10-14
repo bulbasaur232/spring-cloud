@@ -1,0 +1,15 @@
+spring:
+  application:
+    name: user-service
+
+server:
+  port: 9001
+
+eureka:
+  client:
+    register-with-eureka: true
+    fetch-registry: true
+    # 서버의 위치를 지정
+    service-url:
+      # 서버가 가지고 있는 위치 값
+      default-zone: http://127.0.0.1:8761/eureka
