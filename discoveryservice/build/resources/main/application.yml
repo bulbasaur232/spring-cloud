@@ -1,0 +1,12 @@
+spring:
+  application:
+    name: discoveryservice
+
+server:
+  port: 8761
+
+# Eureka Server는 굳이 자신의 정보를 등록할 필요 없음(본인을 다른 서버가 찾을 일이 없으므로)
+eureka:
+  client:
+    register-with-eureka: false
+    fetch-registry: false
