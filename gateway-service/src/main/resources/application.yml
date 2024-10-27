@@ -4,22 +4,31 @@ spring:
   cloud:
     gateway:
       routes:
+        # 일반적인 서비스 라우트
         - id: first-service
           uri: lb://FIRST-SERVICE
           predicates:
             - Path=/first-service/**
           filters:
-            #            - AddRequestHeader=first-request, first-request-header2
-            #            - AddResponseHeader=first-response, first-response-header2
             - CustomFilter
+            - RewritePath=/first-service/(?<segment>.*), /$\{segment}
+        # Actuator 라우트를 먼저 정의 (더 구체적인 패턴)
+        - id: first-service
+          uri: lb://FIRST-SERVICE
+          predicates:
+            - Path=/first-service/actuator/**
+            - Method=GET,POST
+          filters:
+            - RemoveRequestHeader=Cookie
+            - RewritePath=/first-service/(?<segment>.*), /$\{segment}
+
         - id: second-service
           uri: lb://SECOND-SERVICE
           predicates:
             - Path=/second-service/**
           filters:
-            #            - AddRequestHeader=second-request, second-request-header2
-            #            - AddResponseHeader=second-response, second-response-header2
             - CustomFilter
+            - RewritePath=/second-service/(?<segment>.*), /$\{segment}
             - name: LoggingFilter
               args:
                 baseMessage: Spring Cloud Gateway Global Filter
@@ -32,6 +41,7 @@ spring:
             preLogger: true
             postLogger: true
 
+
 server:
   port: 8000
 
@@ -41,3 +51,9 @@ eureka:
     fetch-registry: true
     service-url:
       defaultZone: http://localhost:8761/eureka
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: refresh, health, beans, httpexchanges
